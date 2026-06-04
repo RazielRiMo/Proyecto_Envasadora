@@ -17,6 +17,9 @@
 #define NIV2 9 //nivel medio o seguro para sequir
 #define NIV3 10 //nivel bajo o critico
 
+//parada de emetgencia
+
+#define EMERGENCY_PIN 2
 
 //definicion de variables
 
@@ -104,6 +107,10 @@ void setup() {
   pinMode(NIV2, INPUT);
   pinMode(NIV3, INPUT);
 
+  //definicion de pines de emergencia
+
+  pinMode(EMERGENCY_PIN, INPUT);
+
   //Wire.begin(); //descomentar si hay sensor i2c
 
   //inicializo el json
@@ -144,6 +151,16 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(NIV1), isr_sen, CHANGE);
   attachInterrupt(digitalPinToInterrupt(NIV2), isr_sen, CHANGE);
   attachInterrupt(digitalPinToInterrupt(NIV3), isr_sen, CHANGE);
+
+  //interrupcion de parada de emergencia
+  attachInterrupt(digitalPinToInterrupt(EMERGENCY_PIN), [](){
+    // Detener todas las tareas y poner el sistema en un estado seguro
+    vTaskSuspendAll(); // Suspender todas las tareas
+    // Aquí puedes agregar código para apagar motores, cerrar válvulas, etc.
+    while (true) {
+      // Mantener el sistema detenido
+    }
+  }, RISING);
 
   //se definen las tareas
 
