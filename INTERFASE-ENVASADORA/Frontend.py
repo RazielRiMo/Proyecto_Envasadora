@@ -12,7 +12,15 @@ def detener_servidor ():
 
 def enviar_nivel ():
     #de momento aqui no hay nada
-    pass
+    try:
+        nivel = int(textbox.get())
+        if ((nivel <= 100) & (nivel >=0)):
+            #aqui se supone envia el datos
+            pass
+        else:
+            raise ValueError("el numero tiene que ser entre 0 y 100")
+    except ValueError as er:
+        messagebox.showerror("ERROR", str(er))
 
 def parada_de_emergencia():
     #de momento aqui no hay nada
@@ -124,17 +132,17 @@ sf1n3.pack(padx=10, pady=10)
 #contenido subframe 2 nivel 2 sub frames nivel 3
 
 sf2n3 = tk.Frame(sf2n2,
-                 bg="#FF0000",
+                 bg="#FFFFFF",
                  width=200,
-                 height=325)
+                 height=250)
 
 sf2n3.pack()
 sf2n3.pack_propagate(False)
 
 sf3n3 = tk.Frame(sf2n2,
-                 bg="#00F54A",
+                 bg="#FFFFFF",
                  width=200,
-                 height=325)
+                 height=400)
 
 sf3n3.pack()
 sf3n3.pack_propagate(False)
@@ -193,7 +201,29 @@ llenar = tk.Button(sf2n3,
 llenar.pack(padx=10,pady=10)
 llenar.pack_propagate(False)
 
+#contenido subframe 3 nivel 3
 
+label2 = tk.Label(sf3n3,
+                  text="ESTADO\nDEL TANQUE",
+                  justify="center",
+                  font=("Consolas", 15),
+                  width=20,
+                  height=2,
+                  bg="#ffffff",
+                  fg="#000000")
 
+label2.pack(pady=10)
+
+#subframe de nivel 4
+
+estado_tanque = tk.Frame(sf3n3,
+                         bg="#B40488",
+                         highlightbackground="#000000",
+                         highlightthickness=2,
+                         width=180,
+                         height=350)
+
+estado_tanque.pack(padx=10,pady=10)
+estado_tanque.pack_propagate(False)
 
 v.mainloop()
