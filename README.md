@@ -10,6 +10,21 @@ nucleo 401RE para control de sensores y actuadores
 
 ESP32WROOM para control de telemetria y manejo de la STM32 por medio de comunicacion UART
 
+## programa PC
+
+programa de interface controlado desde el pc en python con tkinter teniendo sus partes separadas por:
+-Frontend
+-backend
+
+### Frontend
+
+es la cascara del programa o su interface todo lo grafico va aqui, por medio de este programa se interactua con el backend
+
+### Backend
+
+Es el corazon del servidor y el que se comunica con la esp para darle instrucciones a la stm32
+
+
 ## perifericos
 
     -sensor de proximidad: ultrasonido
