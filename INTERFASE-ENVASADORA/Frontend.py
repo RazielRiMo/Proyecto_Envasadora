@@ -1,19 +1,267 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 import json
 
-def iniciar_servidor ():
-    #de momento aqui no hay nada    
-    pass
 
-def detener_servidor ():
+#definicion y tamaño de la ventana
+class Frontend (tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("INTERFASE ENVASADORA")
+        self.geometry("1200x700")
+        self.configure(bg="#ffffff")
+        
+        self.selected_tp = tk.StringVar(value="todos")
+        self.objetosframe1()
+        #self.refrescarventana()
+
+    def objetosframe1(self):
+        self.style = ttk.Style()
+        
+        self.style.configure("main.TFrame", background="#ffffff")
+        v = ttk.Frame(self, style="main.TFrame")
+        v.pack()
+        #definicion de los 3 framesutilizados principalmente
+
+        #ferame de control de agua y conceccion
+        
+        self.style.theme_use("clam")
+        self.style.configure("control.TFrame", background = "#ffffff")
+        self.Control_de_agua = ttk.Frame(v,
+                                        width=400,
+                                        height=700,
+                                        style="control.TFrame")
+        self.Control_de_agua.grid(row=0, column=0)
+        self.Control_de_agua.grid_propagate(False)
+
+        #frame de monitoreo de datos y estacion
+
+        self.style.configure("seguimiento.TFrame", background="#FFFFFF")
+        self.fr2 = ttk.Frame(v,
+                            width=400,
+                            height=700,
+                            style="seguimiento.TFrame")
+        
+        self.fr2.grid(row=0, column=1)
+        self.fr2.grid_propagate(False)
+        
+        #frame de historial de datos recibidos
+        
+        self.style.configure("registro.TFrame", background="#e70000")
+        self.fr3 = ttk.Frame(v,
+                            width=400,
+                            height=700,
+                            style="registro.TFrame")
+        
+        self.fr3.grid(row=0, column=2)
+        self.fr3.grid_propagate(False)
+
+        #sub frame1 niv 1
+        self.style.configure("inidet.TFrame", background="#ffffff")
+        self.iniciar_detener_servidor = ttk.Frame(self.Control_de_agua,
+                                            style="inidet.TFrame",
+                                            width=400,
+                                            height=50)
+
+        self.iniciar_detener_servidor.pack()
+        self.iniciar_detener_servidor.pack_propagate(False)
+
+        self.style.configure("controlniv.TFrame", background="#8b8b8b")
+        self.caja_control_nivel = ttk.Frame(self.Control_de_agua,
+                                        style="controlniv.TFrame",
+                                        width=400,
+                                        height=650)
+
+        self.caja_control_nivel.pack()
+        self.caja_control_nivel.pack_propagate(False)
+
+        #botones frame 1 subframe 1 nivel 1
+
+        self.style.configure("iniserv.TButton", background="#ffffff")
+        self.iniserv = ttk.Button(self.iniciar_detener_servidor,
+                                style="iniserv.TButton",
+                                text="iniciar servidor",
+                                width=24,
+                                command=iniciar_servidor)
+
+        self.iniserv.grid(row=0, column=0, padx=10, pady=5)
+        self.iniserv.grid_propagate(False)
+
+        self.style.configure("detserv.TButton", background="#ffffff")
+        self.detserv = ttk.Button(self.iniciar_detener_servidor,
+                                style="detserv.TButton",  
+                                text="detener servidor",
+                                width=24,
+                                command=detener_servidor)
+
+        self.detserv.grid(row=0,column=1,padx=10,pady=5)
+        self.detserv.grid_propagate(False)
+
+        #subfame 1 subreames nivel 2
+        self.style.configure("nivelg.TFrame", background="#ffffff")
+        self.contenedor_nivel_grafico =ttk.Frame(self.caja_control_nivel,
+                                            width=200,
+                                            height=650,
+                                            style="nivelg.TFrame")
+
+        self.contenedor_nivel_grafico.grid(row=0,column=0)
+        self.contenedor_nivel_grafico.grid_propagate(False)
+
+        self.style.configure("conniv.TFrame", background="#ffffff")
+        self.sf2n2 =ttk.Frame(self.caja_control_nivel,
+                        style="conniv.TFrame",
+                        width=200,
+                        height=650)
+
+        self.sf2n2.grid(row=0,column=1)
+        self.sf2n2.grid_propagate(False)
+
+        #contenido subframe 1 nivel 2 
+
+        self.style.configure("nivgr.TFrame", background="#1BE4FF", borderwidth=2, relief="solid")
+        sf1n3 = ttk.Frame(self.contenedor_nivel_grafico,
+                        style="nivgr.TFrame",
+                        width=180,
+                        height=630)
+
+        sf1n3.pack(padx=10, pady=10)
+
+        #contenido subframe 2 nivel 2 sub frames nivel 3
+
+        self.style.configure("nomeacuerdo.TFrame", background="#FFFFFF")
+        self.sf2n3 = ttk.Frame(self.sf2n2,
+                        style="nomeacuerdo.TFrame",
+                        width=200,
+                        height=250)
+
+        self.sf2n3.pack()
+        self.sf2n3.pack_propagate(False)
+
+        self.style.configure("niputidea.TFrame", background="#FFFFFF")
+        self.sf3n3 = ttk.Frame(self.sf2n2,
+                        style="niputidea.TFrame",
+                        width=200,
+                        height=400)
+
+        self.sf3n3.pack()
+        self.sf3n3.pack_propagate(False)
+
+        #label estado de botella
+
+        self.style.configure("estadobotella.TLabel", foreground="#ff0000", background="#ffffff", font=("Rockwell",10))
+        estado_botella = ttk.Label(self.sf2n3,
+                                text="ESPERANDO\nCONECCION",
+                                justify="center",
+                                anchor="center",
+                                style="estadobotella.TLabel",
+                                width=28)
+
+        estado_botella.pack(pady=10)
+        estado_botella.pack_propagate(False)
+
+        #label explicacion
+
+        self.style.configure("label1.TLabel", foreground="#000000", background="#ffffff",font=("Consolas", 10))
+        label1 = ttk.Label(self.sf2n3,
+                        text="Digite la cantidad\nque desea llenar",
+                        justify="center",
+                        anchor="center",
+                        style="label1.TLabel",
+                        width=28)
+
+        label1.pack(pady=10)
+        label1.pack_propagate(False)
+
+        #text box para la digitacion en mililitros
+
+        self.style.configure("textbox.TEntry", foreground="#000000", fieldbackground="#ffffff", background="#ffffff", bordercolor="#000000")
+        self.textbox = ttk.Entry(self.sf2n3,
+                        width=30,
+                        style="textbox.TEntry",
+                        justify="center")
+
+        self.textbox.pack(padx=10,pady=10, ipady=6)
+        self.textbox.pack_propagate(False)
+
+        #boton de llenado
+
+        self.style.configure("llenar.TButton", background= "#ffffff")
+        self.llenar = ttk.Button(self.sf2n3,
+                        text="LLENAR",
+                        width=24,
+                        command=enviar_nivel,
+                        style="llenar.TButton")
+
+        self.llenar.pack(padx=10,pady=10)
+        self.llenar.pack_propagate(False)
+
+        #contenido subframe 3 nivel 3
+
+        self.style.configure("label2.TLabel", font=("Consolas", 15),background="#ffffff", foregraund="#000000")
+        self.label2 = ttk.Label(self.sf3n3,
+                        text="ESTADO\nDEL TANQUE",
+                        justify="center",
+                        width=20,
+                        anchor="center",
+                        style="label2.TLabel")
+
+        self.label2.pack(pady=10)
+
+        #subframe de nivel 4
+
+        self.style.configure("estadotanque.TFrame", background="#B40488", borderwidth=2, relief="solid")
+        self.estado_tanque = ttk.Frame(self.sf3n3,
+                                width=180,
+                                height=350,
+                                style="estadotanque.TFrame")
+
+        self.estado_tanque.pack(padx=10,pady=10)
+        self.estado_tanque.pack_propagate(False)
+        
+        self.style.configure("lleno.TFrame", background="#00ff00")
+        self.lleno = ttk.Frame(self.estado_tanque,
+                               width=180,
+                               height=90,
+                               style="lleno.TFrame")
+        
+        self.lleno.pack()
+        self.lleno.pack_propagate(False)
+        
+        self.style.configure("medio.TFrame", background="#d9ff00")
+        self.medio = ttk.Frame(self.estado_tanque,
+                               width=180,
+                               height=130,
+                               style="medio.TFrame")
+        
+        self.medio.pack()
+        self.medio.pack_propagate(False)
+        
+        self.style.configure("critico.TFrame", background="#ff0000")
+        self.critico = ttk.Frame(self.estado_tanque,
+                               width=180,
+                               height=90,
+                               style="critico.TFrame")
+        
+        self.critico.pack()
+        self.critico.pack_propagate(False)
+        
+        
+    
+def refrescarventana(self):
+        pass
+        
+def iniciar_servidor (self):
+    #de momento aqui no hay nada    
+        pass
+
+def detener_servidor (self):
     #de momento aqui no hay nada
     pass
 
-def enviar_nivel ():
+def enviar_nivel (self):
     #de momento aqui no hay nada
     try:
-        nivel = int(textbox.get())
+        nivel = int(self.textbox.get())
         if ((nivel <= 100) & (nivel >=0)):
             #aqui se supone envia el datos
             pass
@@ -22,208 +270,12 @@ def enviar_nivel ():
     except ValueError as er:
         messagebox.showerror("ERROR", str(er))
 
-def parada_de_emergencia():
+def parada_de_emergencia(self):
     #de momento aqui no hay nada
     pass
 
-#definicion y tamaño de la ventana
 
-v = tk.Tk()
-v.title("INTERFASE ENVASADORA")
-v["bg"]="#ffffff"
-v.geometry("1200x700")
 
-#definicion de los 3 framesutilizados principalmente
-
-#ferame de control de agua y conceccion
-
-fr1 = tk.Frame(v,
-               bg="#ffffff",
-               width=400,
-               height=700)
-fr1.grid(row=0, column=0)
-
-#frame de monitoreo de datos y estacion
-
-fr2 = tk.Frame(v,
-               bg="lightblue",
-               width=400,
-               height=700)
-fr2.grid(row=0, column=1)
-
-#frame de historial de datos recibidos
-
-fr3 = tk.Frame(v,
-               bg="#ffffff",
-               width=400,
-               height=700)
-fr3.grid(row=0, column=2)
-
-#sub frame1 niv 1
-
-sf1n1 = tk.Frame(fr1,
-                 bg="#ffffff",
-                 width=400,
-                 height=50)
-
-sf1n1.pack()
-sf1n1.pack_propagate(False)
-
-sf2n1 = tk.Frame(fr1,
-                 bg="#8b8b8b",
-                 width=400,
-                 height=650)
-
-sf2n1.pack()
-sf2n1.pack_propagate(False)
-
-#botones frame 1 subframe 1 nivel 1
-
-iniserv = tk.Button(
-    sf1n1,
-    text="iniciar servidor",
-    width=24,
-    height=1,
-    command=iniciar_servidor,
-    bg="#ffffff")
-
-iniserv.grid(row=0, column=0, padx=10, pady=5)
-iniserv.grid_propagate(False)
-
-detserv = tk.Button(sf1n1,
-                    text="detener servidor",
-                    width=24, height=1,
-                    command=detener_servidor,
-                    bg="#ffffff",
-                    fg="#000000")
-
-detserv.grid(row=0,column=1,padx=10,pady=5)
-detserv.grid_propagate(False)
-
-#subfame 1 subreames nivel 2
-
-sf1n2 =tk.Frame(sf2n1,
-                bg="#ffffff",
-                width=200,
-                height=650)
-
-sf1n2.grid(row=0,column=0)
-sf1n2.grid_propagate(False)
-
-sf2n2 =tk.Frame(sf2n1,
-                bg="#d69393",
-                width=200,
-                height=650)
-
-sf2n2.grid(row=0,column=1)
-sf2n2.grid_propagate(False)
-
-#contenido subframe 1 nivel 2 
-
-sf1n3 = tk.Frame(sf1n2,
-                 bg="#00F5E9",
-                 width=180,
-                 height=630,
-                 highlightbackground="#000000",
-                 highlightthickness=2)
-
-sf1n3.pack(padx=10, pady=10)
-
-#contenido subframe 2 nivel 2 sub frames nivel 3
-
-sf2n3 = tk.Frame(sf2n2,
-                 bg="#FFFFFF",
-                 width=200,
-                 height=250)
-
-sf2n3.pack()
-sf2n3.pack_propagate(False)
-
-sf3n3 = tk.Frame(sf2n2,
-                 bg="#FFFFFF",
-                 width=200,
-                 height=400)
-
-sf3n3.pack()
-sf3n3.pack_propagate(False)
-
-#label estado de botella
-
-estado_botella = tk.Label(sf2n3,
-                          text="ESPERANDO\nCONECCION",
-                          justify="center",
-                          fg="#FF0000",
-                          font=("Rockwell",10),
-                          bg="#ffffff",
-                          height=2,
-                          width=28)
-
-estado_botella.pack(pady=10)
-estado_botella.pack_propagate(False)
-
-#label explicacion
-
-label1 = tk.Label(sf2n3,
-                  text="Digite la cantidad\nque desea llenar",
-                  justify="center",
-                  fg="#000000",
-                  font=("Consolas", 10),
-                  bg="#ffffff",
-                  height=2,
-                  width=28)
-
-label1.pack(pady=10)
-label1.pack_propagate(False)
-
-#text box para la digitacion en mililitros
-
-textbox = tk.Entry(sf2n3,
-                   width=30,
-                   bg="#ffffff",
-                   fg="#000000",
-                   highlightbackground="#000000",
-                   highlightthickness=2,
-                   justify="center")
-
-textbox.pack(padx=10,pady=10, ipady=6)
-textbox.pack_propagate(False)
-
-#boton de llenado
-
-llenar = tk.Button(sf2n3,
-                   text="LLENAR",
-                   width=24,
-                   height=2,
-                   command=enviar_nivel,
-                   bg="#ffffff",
-                   fg="#000000")
-
-llenar.pack(padx=10,pady=10)
-llenar.pack_propagate(False)
-
-#contenido subframe 3 nivel 3
-
-label2 = tk.Label(sf3n3,
-                  text="ESTADO\nDEL TANQUE",
-                  justify="center",
-                  font=("Consolas", 15),
-                  width=20,
-                  height=2,
-                  bg="#ffffff",
-                  fg="#000000")
-
-label2.pack(pady=10)
-
-#subframe de nivel 4
-
-estado_tanque = tk.Frame(sf3n3,
-                         bg="#B40488",
-                         highlightbackground="#000000",
-                         highlightthickness=2,
-                         width=180,
-                         height=350)
-
-estado_tanque.pack(padx=10,pady=10)
-estado_tanque.pack_propagate(False)
-
-v.mainloop()
+if __name__ == "__main__":
+    app = Frontend()
+    app.mainloop()
