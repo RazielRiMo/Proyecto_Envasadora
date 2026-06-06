@@ -11,11 +11,12 @@ class Frontend (tk.Tk):
         self.geometry("1200x700")
         self.configure(bg="#ffffff")
         
-        self.selected_tp = tk.StringVar(value="todos")
-        self.objetosframe1()
+        self.automatico = tk.BooleanVar(value=True)
+        self.nivel = tk.IntVar(value=50)
+        self.objetosventana()
         #self.refrescarventana()
 
-    def objetosframe1(self):
+    def objetosventana(self):
         self.style = ttk.Style()
         
         self.style.configure("main.TFrame", background="#ffffff")
@@ -47,7 +48,7 @@ class Frontend (tk.Tk):
         
         #frame de historial de datos recibidos
         
-        self.style.configure("registro.TFrame", background="#e70000")
+        self.style.configure("registro.TFrame", background="#ffffff")
         self.fr3 = ttk.Frame(v,
                             width=400,
                             height=700,
@@ -77,22 +78,22 @@ class Frontend (tk.Tk):
 
         #botones frame 1 subframe 1 nivel 1
 
-        self.style.configure("iniserv.TButton", background="#ffffff")
+        self.style.configure("iniserv.TButton", background="#ffffff", padding=(0,9))
         self.iniserv = ttk.Button(self.iniciar_detener_servidor,
                                 style="iniserv.TButton",
                                 text="iniciar servidor",
                                 width=24,
-                                command=iniciar_servidor)
+                                command=self.iniciar_servidor)
 
         self.iniserv.grid(row=0, column=0, padx=10, pady=5)
         self.iniserv.grid_propagate(False)
 
-        self.style.configure("detserv.TButton", background="#ffffff")
+        self.style.configure("detserv.TButton", background="#ffffff", padding=(0,9))
         self.detserv = ttk.Button(self.iniciar_detener_servidor,
                                 style="detserv.TButton",  
                                 text="detener servidor",
                                 width=24,
-                                command=detener_servidor)
+                                command=self.detener_servidor)
 
         self.detserv.grid(row=0,column=1,padx=10,pady=5)
         self.detserv.grid_propagate(False)
@@ -185,11 +186,11 @@ class Frontend (tk.Tk):
 
         #boton de llenado
 
-        self.style.configure("llenar.TButton", background= "#ffffff")
+        self.style.configure("llenar.TButton", background= "#ffffff", padding=(0,9))
         self.llenar = ttk.Button(self.sf2n3,
                         text="LLENAR",
                         width=24,
-                        command=enviar_nivel,
+                        command=self.enviar_nivel,
                         style="llenar.TButton")
 
         self.llenar.pack(padx=10,pady=10)
@@ -245,34 +246,238 @@ class Frontend (tk.Tk):
         self.critico.pack()
         self.critico.pack_propagate(False)
         
+        #FRame Principal2
         
-    
-def refrescarventana(self):
+        ## Frame DE IP
+        
+        self.style.configure("IDframe.TFrame", background="#ffffff")
+        self.IDfame = ttk.Frame(self.fr2,
+                                style="IDframe.TFrame",
+                                width=400,
+                                height=50,)
+        
+        self.IDfame.pack()
+        self.IDfame.pack_propagate(False)
+        
+        ##Frame de informacion
+        
+        self.style.configure("info.TFrame", background="#ffffff")
+        self.info = ttk.Frame(self.fr2,
+                              style="info.TFrame",
+                              width=400,
+                              height=600)
+        
+        self.info.pack()
+        self.info.pack_propagate(False)
+        
+        ##Frame de boton de emergrncia
+        
+        self.style.configure("emergencia.TFrame", background="#fffb00")
+        self.emer = ttk.Frame(self.fr2,
+                              style="emergencia.TFrame",
+                              width=400,
+                              height=50)
+        
+        self.emer.pack()
+        self.emer.pack_propagate(False)
+        
+        ###label de ip
+        
+        self.style.configure("IP.TLabel", background="#ffffff", foreground="#000000", font=("Consolas", 10))
+        self.labelIP = ttk.Label(self.IDfame,
+                                 text="IP:0.0.0.0",
+                                 width=28,
+                                 style="IP.TLabel")
+        
+        self.labelIP.grid(column=0, row=0)
+        self.labelIP.grid_propagate(False)
+        
+        ###label de estado del servidor
+        
+        self.style.configure("estadoserv.TLabel", background="#FFFFFF", foreground="#FF0000", font=("Consolas", 10), padding=(0,15))
+        self.estados = ttk.Label(self.IDfame,
+                                 text="SERVIDOR DETENIDO",
+                                 width=28,
+                                 style="estadoserv.TLabel")
+        
+        self.estados.grid(column=1, row=0)
+        self.estados.grid_propagate(False)
+        
+        ###sub frames de informacion
+        
+        self.style.configure("titulo.TFrame", background="#ffffff")
+        self.titulo = ttk.Frame(self.info,
+                                style="titulo.TFrame",
+                                width=400,
+                                height=50)
+        
+        self.titulo.pack()
+        self.titulo.pack_propagate(False)
+        
+        self.style.configure("titulo.TLabel",  background="#ffffff", foreground="#000000", font=("Consolas", 15), padding=(0,15,0,0))
+        self.titu = ttk.Label(self.titulo,
+                              style="titulo.TLabel",
+                              text="ESTACION DE LA BOTELLA",
+                              justify="center",
+                              anchor="center")
+        
+        self.titu.pack()
+        self.titu.pack_propagate(False)
+        
+        self.style.configure("estacion.TFrame", background="#ffffff")
+        self.estacion = ttk.Frame(self.info,
+                                  width=400,
+                                  height=200,
+                                  style="estacion.TFrame")
+        
+        self.estacion.pack()
+        self.estacion.pack_propagate(False)
+        
+        self.style.configure("auto.TFrame", background="#ffffff")
+        self.auto = ttk.Frame(self.info,
+                              style="auto.TFrame",
+                              width=400,
+                              height=50)
+        
+        self.auto.pack()
+        self.auto.pack_propagate(False)
+        
+        self.style.configure("radio.TRadiobutton", background="#ffffff", font=("Consolas", 10))
+        self.automat = ttk.Radiobutton(self.auto,
+                                       text="automatico",
+                                       variable=self.automatico,
+                                       value=True,
+                                       style="radio.TRadiobutton",
+                                       command=self.enviar_auto)
+        
+        self.automat.grid(column=0, row=0)
+        self.automat.grid_propagate(False)
+        
+        self.manual = ttk.Radiobutton(self.auto,
+                                      text="manual",
+                                      style="radio.TRadiobutton",
+                                      variable=self.automatico,
+                                      value=False,
+                                      command=self.enviar_auto)
+        
+        self.manual.grid(column=1, row=0)
+        self.manual.grid_propagate(False)
+        
+        self.style.configure("informacion.TFrame", background="#FF06B4")
+        self.informacion = ttk.Frame(self.info,
+                                     width=400,
+                                     height=300,
+                                     style="informacion.TFrame")
+        
+        self.informacion.pack()
+        self.informacion.pack_propagate(False)
+        
+        self.style.configure("margen.TFrame", background="#000000")
+        self.margen = ttk.Frame(self.estacion,
+                                style="margen.TFrame",
+                                height=184,
+                                width=384)
+        
+        self.margen.pack(padx=8,pady=8)
+        self.margen.pack_propagate(False)
+        
+        self.style.configure("contenedor.TFrame", background="#ffffff")
+        self.contenedor = ttk.Frame(self.margen,
+                                    width=380,
+                                    height=180,
+                                    style="contenedor.TFrame")
+        
+        self.contenedor.pack(padx=2, pady=2)
+        self.contenedor.pack_propagate(False)
+        self.contenedor.grid_propagate(False)
+        self.contenedor.grid_columnconfigure(0, minsize=127)
+        self.contenedor.grid_columnconfigure(1, minsize=127)
+        self.contenedor.grid_columnconfigure(2, minsize=126)
+        self.contenedor.grid_rowconfigure(0, minsize=180)
+        
+        self.style.configure("inicio.TFrame", background="#ffffff")
+        self.inicio = ttk.Frame(self.contenedor,
+                                width=127,
+                                height=180,
+                                style="inicio.TFrame")
+        
+        self.inicio.grid(column=0, row=0, sticky="nsew")
+        self.inicio.grid_propagate(False)
+        
+        self.style.configure("inicio.TLabel", background="#ffffff", foreground="#000000", font=("Consolas", 15))
+        self.labelini = ttk.Label(self.inicio,
+                                  style="inicio.TLabel",
+                                  text="INICIO",
+                                  justify="center",
+                                  anchor="center")
+        self.labelini.pack(fill="both", expand=True, padx=10)
+        
+        self.style.configure("llenado.TFrame", background="#ffffff")
+        self.llenado = ttk.Frame(self.contenedor,
+                                 width=127,
+                                 height=180,
+                                 style="llenado.TFrame")
+        
+        self.llenado.grid(column=1,row=0, sticky="nsew")
+        self.llenado.grid_propagate(False)
+        
+        self.style.configure("llenado.TLabel", background="#ffffff", foreground="#000000", font=("Consolas", 15))
+        self.labelll = ttk.Label(self.llenado,
+                                 style="llenado.TLabel",
+                                 text="LLENADO",
+                                 justify="center",
+                                 anchor="center")
+        
+        self.labelll.pack(fill="both", expand=True, padx=10)
+        
+        self.style.configure("listo.TFrame", background="#ffffff")
+        self.listo = ttk.Frame(self.contenedor,
+                               style="listo.TFrame",
+                               width=126,
+                               height=180)
+        
+        self.listo.grid(column=2,row=0, sticky="nsew")
+        self.listo.grid_propagate(False)
+        
+        self.style.configure("listo.TLabel", background="#ffffff", foreground="#000000", font=("Consolas", 15))
+        self.labelis = ttk.Label(self.listo,
+                                 style="listo.TLabel",
+                                 justify="center",
+                                 anchor="center",
+                                 text="LISTO")
+        
+        self.labelis.pack(fill="both", expand=True)
+        
+        
+    def enviar_auto(self):
         pass
         
-def iniciar_servidor (self):
+    def refrescarventana(self):
+        pass
+        
+    def iniciar_servidor (self):
     #de momento aqui no hay nada    
         pass
 
-def detener_servidor (self):
+    def detener_servidor (self):
     #de momento aqui no hay nada
-    pass
+        pass
 
-def enviar_nivel (self):
-    #de momento aqui no hay nada
-    try:
-        nivel = int(self.textbox.get())
-        if ((nivel <= 100) & (nivel >=0)):
-            #aqui se supone envia el datos
-            pass
-        else:
-            raise ValueError("el numero tiene que ser entre 0 y 100")
-    except ValueError as er:
-        messagebox.showerror("ERROR", str(er))
+    def enviar_nivel (self):
+        #de momento aqui no hay nada
+        try:
+            nivel = int(self.textbox.get())
+            if ((nivel <= 100) & (nivel >=0)):
+                #aqui se supone envia el datos
+                pass
+            else:
+                raise ValueError("el numero tiene que ser entre 0 y 100")
+        except ValueError as er:
+            messagebox.showerror("ERROR", str(er))
 
-def parada_de_emergencia(self):
-    #de momento aqui no hay nada
-    pass
+    def parada_de_emergencia(self):
+        #de momento aqui no hay nada
+        pass
 
 
 
