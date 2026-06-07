@@ -11,6 +11,9 @@ class Frontend (tk.Tk):
         self.geometry("1200x700")
         self.configure(bg="#ffffff")
         
+        self.x=0
+        self.y=100
+        
         self.automatico = tk.BooleanVar(value=True)
         self.nivel = tk.IntVar(value=50)
         self.objetosventana()
@@ -38,24 +41,24 @@ class Frontend (tk.Tk):
         #frame de monitoreo de datos y estacion
 
         self.style.configure("seguimiento.TFrame", background="#FFFFFF")
-        self.fr2 = ttk.Frame(v,
+        self.frame_info = ttk.Frame(v,
                             width=400,
                             height=700,
                             style="seguimiento.TFrame")
         
-        self.fr2.grid(row=0, column=1)
-        self.fr2.grid_propagate(False)
+        self.frame_info.grid(row=0, column=1)
+        self.frame_info.grid_propagate(False)
         
         #frame de historial de datos recibidos
         
         self.style.configure("registro.TFrame", background="#ffffff")
-        self.fr3 = ttk.Frame(v,
+        self.frame_registro = ttk.Frame(v,
                             width=400,
                             height=700,
                             style="registro.TFrame")
         
-        self.fr3.grid(row=0, column=2)
-        self.fr3.grid_propagate(False)
+        self.frame_registro.grid(row=0, column=2)
+        self.frame_registro.grid_propagate(False)
 
         #sub frame1 niv 1
         self.style.configure("inidet.TFrame", background="#ffffff")
@@ -85,7 +88,7 @@ class Frontend (tk.Tk):
                                 width=24,
                                 command=self.iniciar_servidor)
 
-        self.iniserv.grid(row=0, column=0, padx=10, pady=5)
+        self.iniserv.grid(row=0, column=0, padx=25, pady=5, sticky="w")
         self.iniserv.grid_propagate(False)
 
         self.style.configure("detserv.TButton", background="#ffffff", padding=(0,9))
@@ -95,7 +98,7 @@ class Frontend (tk.Tk):
                                 width=24,
                                 command=self.detener_servidor)
 
-        self.detserv.grid(row=0,column=1,padx=10,pady=5)
+        self.detserv.grid(row=0,column=1,padx=25,pady=5, sticky="e")
         self.detserv.grid_propagate(False)
 
         #subfame 1 subreames nivel 2
@@ -109,28 +112,28 @@ class Frontend (tk.Tk):
         self.contenedor_nivel_grafico.grid_propagate(False)
 
         self.style.configure("conniv.TFrame", background="#ffffff")
-        self.sf2n2 =ttk.Frame(self.caja_control_nivel,
+        self.contenedor_nivel =ttk.Frame(self.caja_control_nivel,
                         style="conniv.TFrame",
                         width=200,
                         height=650)
 
-        self.sf2n2.grid(row=0,column=1)
-        self.sf2n2.grid_propagate(False)
+        self.contenedor_nivel.grid(row=0,column=1)
+        self.contenedor_nivel.grid_propagate(False)
 
         #contenido subframe 1 nivel 2 
 
         self.style.configure("nivgr.TFrame", background="#1BE4FF", borderwidth=2, relief="solid")
-        sf1n3 = ttk.Frame(self.contenedor_nivel_grafico,
+        nivel_grafico = ttk.Frame(self.contenedor_nivel_grafico,
                         style="nivgr.TFrame",
                         width=180,
                         height=630)
 
-        sf1n3.pack(padx=10, pady=10)
+        nivel_grafico.pack(padx=10, pady=10)
 
         #contenido subframe 2 nivel 2 sub frames nivel 3
 
         self.style.configure("nomeacuerdo.TFrame", background="#FFFFFF")
-        self.sf2n3 = ttk.Frame(self.sf2n2,
+        self.sf2n3 = ttk.Frame(self.contenedor_nivel,
                         style="nomeacuerdo.TFrame",
                         width=200,
                         height=250)
@@ -139,7 +142,7 @@ class Frontend (tk.Tk):
         self.sf2n3.pack_propagate(False)
 
         self.style.configure("niputidea.TFrame", background="#FFFFFF")
-        self.sf3n3 = ttk.Frame(self.sf2n2,
+        self.sf3n3 = ttk.Frame(self.contenedor_nivel,
                         style="niputidea.TFrame",
                         width=200,
                         height=400)
@@ -251,7 +254,7 @@ class Frontend (tk.Tk):
         ## Frame DE IP
         
         self.style.configure("IDframe.TFrame", background="#ffffff")
-        self.IDfame = ttk.Frame(self.fr2,
+        self.IDfame = ttk.Frame(self.frame_info,
                                 style="IDframe.TFrame",
                                 width=400,
                                 height=50,)
@@ -262,7 +265,7 @@ class Frontend (tk.Tk):
         ##Frame de informacion
         
         self.style.configure("info.TFrame", background="#ffffff")
-        self.info = ttk.Frame(self.fr2,
+        self.info = ttk.Frame(self.frame_info,
                               style="info.TFrame",
                               width=400,
                               height=600)
@@ -272,8 +275,8 @@ class Frontend (tk.Tk):
         
         ##Frame de boton de emergrncia
         
-        self.style.configure("emergencia.TFrame", background="#fffb00")
-        self.emer = ttk.Frame(self.fr2,
+        self.style.configure("emergencia.TFrame", background="#ffffff")
+        self.emer = ttk.Frame(self.frame_info,
                               style="emergencia.TFrame",
                               width=400,
                               height=50)
@@ -363,7 +366,7 @@ class Frontend (tk.Tk):
         self.manual.grid(column=1, row=0)
         self.manual.grid_propagate(False)
         
-        self.style.configure("informacion.TFrame", background="#FF06B4")
+        self.style.configure("informacion.TFrame", background="#FFFFFF")
         self.informacion = ttk.Frame(self.info,
                                      width=400,
                                      height=300,
@@ -371,6 +374,11 @@ class Frontend (tk.Tk):
         
         self.informacion.pack()
         self.informacion.pack_propagate(False)
+        self.informacion.grid_propagate(False)
+        self.informacion.grid_columnconfigure(0, weight=1)
+        self.informacion.grid_columnconfigure(1, weight=1)
+        for fila in range(3):
+            self.informacion.grid_rowconfigure(fila, weight=1, uniform="info")
         
         self.style.configure("margen.TFrame", background="#000000")
         self.margen = ttk.Frame(self.estacion,
@@ -448,6 +456,124 @@ class Frontend (tk.Tk):
         
         self.labelis.pack(fill="both", expand=True)
         
+        self.style.configure("la.TLabel", background="#ffffff", foreground="#000000", font=("Consolas", 13))
+        self.l1 = ttk.Label(self.informacion,
+                            text="Distancia:",
+                            justify="left",
+                            anchor="w",
+                            style="la.TLabel")
+        
+        self.l1.grid(column=0, row=0, sticky="w", padx=(10, 0))
+        self.l1.grid_propagate(False)
+        
+        self.l2 = ttk.Label(self.informacion,
+                            text="ultima configuracion:",
+                            justify="left",
+                            anchor="w",
+                            style="la.TLabel")
+        
+        self.l2.grid(column=0, row=1, sticky="w", padx=(10, 0))
+        self.l2.grid_propagate(False)
+        
+        self.l3 = ttk.Label(self.informacion,
+                            text="ultimo timestamp:",
+                            justify="left",
+                            anchor="w",
+                            style="la.TLabel")
+        
+        self.l3.grid(column=0, row=2, sticky="w", padx=(10, 0))
+        
+        self.distancia = ttk.Label(self.informacion,
+                                   text="OUT",
+                                   justify="right",
+                                   anchor="e",
+                                   style="la.TLabel")
+        
+        self.distancia.grid(column=1, row=0, sticky="e", padx=(0, 10))
+        self.distancia.grid_propagate(False)
+        
+        self.savelevel = ttk.Label(self.informacion,
+                                   text="50ml",
+                                   justify="right",
+                                   anchor="e",
+                                   style="la.TLabel")
+        
+        self.savelevel.grid(column=1, row=1, sticky="e", padx=(0, 10))
+        self.savelevel.grid_propagate(False)
+        
+        self.timestamp = ttk.Label(self.informacion,
+                                   text="00/00/00 00:00:00",
+                                   justify="right",
+                                   anchor="e",
+                                   style="la.TLabel")
+        
+        self.timestamp.grid(column=1, row=2, sticky="e", padx=(0, 10))
+        self.timestamp.grid_propagate(False)
+        
+        self.style.configure("emergencia.TButton", background="#ffffff", font=("Consolas", 15))
+        self.emergencia = ttk.Button(self.emer,
+                                     text="PARADA DE EMERGECIA",
+                                     command=self.parada_de_emergencia,
+                                     width=30,
+                                     style="emergencia.TButton")
+        
+        self.emergencia.pack()
+        self.emergencia.pack_propagate(False)
+        
+        ###FRAME 3 Registro
+        
+        self.style.configure("blanco.TFrame", background = "#ffffff")
+        
+        self.regedit = ttk.Frame(self.frame_registro,
+                                 style="blanco.TFrame",
+                                 width=400,
+                                 height=50)
+        self.regedit.pack()
+        self.regedit.pack_propagate(False)
+        
+        self.aislar_registro = ttk.Frame(self.frame_registro,
+                                         style="blanco.TFrame",
+                                         width=400,
+                                         height=650)
+        
+        self.aislar_registro.pack()
+        self.aislar_registro.pack_propagate(False)
+        
+        self.l4 = ttk.Label(self.regedit,
+                            style="label2.TLabel",
+                            text="REGISTRO",
+                            width=30,
+                            justify="center",
+                            anchor="center")
+        
+        self.l4.pack(pady=10)
+        self.l4.pack_propagate(False)
+        
+        self.style.configure("registro.TFrame", background="#cacaca")
+        self.contenedor_registro = ttk.Frame(self.aislar_registro,
+                                             style="registro.TFrame",
+                                             width=380,
+                                             height=650)
+        
+        self.contenedor_registro.pack(padx=10, pady=10)
+        self.contenedor_registro.pack_propagate(False)
+        
+        columnas = ("dis", "niv", "crc", "tp")
+        self.tree = ttk.Treeview(self.contenedor_registro,
+                                 columns=columnas,
+                                 show="headings",
+                                 height=30)
+        
+        self.tree.heading("dis", text="dis")
+        self.tree.heading("niv", text="niv")
+        self.tree.heading("crc", text="crc")
+        self.tree.heading("tp", text="tp")
+        
+        self.tree.column("dis", width=50, anchor="center")
+        self.tree.column("niv", width=50, anchor="center")
+        self.tree.column("crc", width=50, anchor="center")
+        self.tree.column("tp", width=250, anchor="center")
+        self.tree.grid(column=0, row=0, sticky="nsew")
         
     def enviar_auto(self):
         pass
