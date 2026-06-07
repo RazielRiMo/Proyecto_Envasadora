@@ -325,3 +325,24 @@ void run_timer(void *pvParameters){
     }
   }
 }
+
+//calcular crc
+
+uint32_t calcularCRC32(String cadena) {
+    uint32_t crc = 0xFFFFFFFF;
+
+    for (int j = 0; j < cadena.length(); j++) {
+        uint8_t byte = (uint8_t)cadena[j];
+        crc ^= byte;
+
+        for (int i = 0; i < 8; i++) {
+            if (crc & 1) {
+                crc = (crc >> 1) ^ 0xEDB88320;
+            } else {
+                crc >>= 1;
+            }
+        }
+    }
+
+    return crc ^ 0xFFFFFFFF;
+  }

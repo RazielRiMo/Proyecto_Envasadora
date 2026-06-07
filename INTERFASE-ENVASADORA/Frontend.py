@@ -1,8 +1,12 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
 import json
+import backend
+import threading
 
+lock = threading.Lock()
 
+enviar={"niv":50, "aut":False, "eme":False}
 #definicion y tamaño de la ventana
 class Frontend (tk.Tk):
     def __init__(self):
@@ -14,10 +18,12 @@ class Frontend (tk.Tk):
         self.x=0
         self.y=100
         
+        self.tarea_server = None
         self.automatico = tk.BooleanVar(value=True)
         self.nivel = tk.IntVar(value=50)
         self.objetosventana()
-        #self.refrescarventana()
+        backend.register_new_data_callback(self.newdata)
+        self.refrescardatos()
 
     def objetosventana(self):
         self.style = ttk.Style()
@@ -288,7 +294,7 @@ class Frontend (tk.Tk):
         
         self.style.configure("IP.TLabel", background="#ffffff", foreground="#000000", font=("Consolas", 10))
         self.labelIP = ttk.Label(self.IDfame,
-                                 text="IP:0.0.0.0",
+                                 text="IP:NULL : Port:NULL",
                                  width=28,
                                  style="IP.TLabel")
         
@@ -576,37 +582,86 @@ class Frontend (tk.Tk):
         self.tree.grid(column=0, row=0, sticky="nsew")
         
     def enviar_auto(self):
-        pass
+        with lock:
+            global enviar
+            enviar["aut"]=self.automatico.get()
+            self.enviar_comando(enviar)
         
-    def refrescarventana(self):
-        pass
+    def refrescardatos(self):
+        with lock:
+            global enviar
+            lineas = backend.recibir_ultimos(30)
+            self.actualizar_tabla(lineas)
         
+        
+    def actualizar_tabla(self, lineas):
+        i = 0
+        global enviar
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+        for linea in lineas:
+            if (i == 0) and (linea["dis"] is not None):
+                self.distancia.configure(text=f"{linea["dis"]}")
+                with lock:
+                    self.savelevel.configure(text=f"{enviar['niv']}")
+                self.timestamp.configure(text=f"{linea["tp"]}")
+            self.tree.insert('', 'end', values=(linea['dis'], linea['niv'], linea['crc'], linea ['tp']))
+    
+    
     def iniciar_servidor (self):
-    #de momento aqui no hay nada    
-        pass
+        if self.tarea_server and self.tarea_server.is_alive():
+            messagebox.showinfo("Servidor", "el servido ya esta iniciado")
+            return
+        self.tarea_server = backend.start_tcp_server(background=True)    
+        self.estados.configure(text="SERVIDOR INICIADO", foreground="#00ff62")
+        self.labelIP.configure(text=f"IP:{backend.HOST}: port:{backend.PORT}")
 
+    
     def detener_servidor (self):
-    #de momento aqui no hay nada
-        pass
-
+        backend.stop_tcp_server()
+        self.estados.configure(text="SERVIDOR DETENIDO", foreground="#ff0000")
+        self.labelIP.configure(text="IP:NULL : PORT:NULL")
+    
+    
     def enviar_nivel (self):
         #de momento aqui no hay nada
+        global enviar
         try:
             nivel = int(self.textbox.get())
             if ((nivel <= 100) & (nivel >=0)):
                 #aqui se supone envia el datos
-                pass
+                with lock:
+                    enviar["niv"]= nivel
+                    self.enviar_comando(enviar)
             else:
                 raise ValueError("el numero tiene que ser entre 0 y 100")
         except ValueError as er:
             messagebox.showerror("ERROR", str(er))
 
     def parada_de_emergencia(self):
-        #de momento aqui no hay nada
-        pass
+        global enviar
+        with lock:
+            enviar["eme"]=True
+            self.enviar_comando(enviar)
+    
+    def newdata(self, datos):
+        self.after(100, self.refrescardatos)
 
-
+    def on_close(self):
+        backend.stop_tcp_server()
+        print("programa cerrado")
+        self.destroy()
+        
+    def enviar_comando(self, dat):
+        try:
+            dato = json.dumps(dat)
+            dato = json.loads(dato)
+            print(dato)
+            backend.enviar_cadena(dato)
+        except Exception as e:
+            messagebox.showerror("enviar comando","No se pudo enviar el dato:"+str(e))
 
 if __name__ == "__main__":
     app = Frontend()
+    app.protocol("WM_DELETE_WINDOW", app.on_close)
     app.mainloop()
