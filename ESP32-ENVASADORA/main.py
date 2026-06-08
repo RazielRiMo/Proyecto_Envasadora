@@ -1,5 +1,7 @@
 import uasyncio as asyncio #type: ignore
 #lo que vendria siendo el freeRTOS
+import bluetooth #type: ignore
+from micropython import const #type: ignore 
 import ujson as json #type: ignore
 import uos #type: ignore
 from machine import UART, I2C, Pin, RTC, PWM #type: ignore
@@ -8,8 +10,55 @@ import network #type: ignore
 import usocket #type: ignore
 import utime #type: ignore
 
+_IRQ_CENTRAL_CONNECT = const(1)
+_IRQ_CENTRAL_DISCONNECT = const(2)
+_IRQ_GATTS_WRITE = const(3)
 
-pin = 2
+ble = bluetooth.BLE()
+ble.active(True)
+ble.config(gap_name="Puto el que se conecte")
+
+_UART_UUID = bluetooth.UUID("6E400001-B5A3-F393-E0A9-E50E24DCCA9E")
+_UART_RX = (bluetooth.UUID("6E400002-B5A3-F393-E0A9-E50E24DCCA9E"), bluetooth.FLAG_WRITE,)
+_UART_TX = (bluetooth.UUID("6E400003-B5A3-F393-E0A9-E50E24DCCA9E"), bluetooth.FLAG_NOTIFY,)
+_UART_SERVICE = (_UART_UUID, (_UART_TX, _UART_RX,),)
+
+services = (_UART_SERVICE,)
+((tx, rx,),) = ble.gatts_register_services(services)
+#tamaño del buffer de recepcion
+ble.gatts_set_buffer(rx, 100)
+#definir la interrupcion del bluetooth
+while not ble.active():
+    utime.sleep(1)
+    print("Activando Bluetooth...")
+
+def bt_irq(event, data):
+    if event == _IRQ_CENTRAL_CONNECT:
+        print("Central connected")
+    elif event == _IRQ_CENTRAL_DISCONNECT:
+        print("Central disconnected")
+    if event == _IRQ_GATTS_WRITE:
+        buffer = ble.gatts_read(rx).decode("utf-8").strip()
+        print("Received:", buffer)
+
+ble.irq(bt_irq)
+
+def anunciar():
+    payload = bytearray([2,1,6, len("puto el que se conecte") + 1, 9]) + "puto el que se conecte".encode("utf-8")
+    ble.gap_advertise(100, payload)
+    print("Anunciando Bluetooth...")
+    
+
+anunciar()
+
+def enviar_alerta(alerta):
+    men= "\n"
+    mensaje = alerta
+    if mensaje:
+        mensaje = men + mensaje
+        ble.gatts_notify(0, tx, mensaje.encode("utf-8"))
+
+
 pin = 2
 pwm = PWM(pin, freq=50, duty_u16=0)
 wf = network.WLAN(network.STA_IF)
@@ -87,6 +136,8 @@ async def leer_socket():
                     socket_buf = socket_buf[idx + 1:]
                     if linea:
                         obj = procesar_linea_socket(linea)
+                        if obj["niv"] == 1: #type: ignore
+                            enviar_alerta("Nivel de agua bajo!")
                         uart_tx_queue = json.dumps(obj)
                         await enviar_socket_a_uart()
             elif data == b"":
