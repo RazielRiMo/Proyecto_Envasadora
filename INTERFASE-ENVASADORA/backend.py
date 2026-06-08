@@ -1,11 +1,8 @@
 import socket
 import threading
-import signal
-import sys
 import os
 import csv
 import json
-from collections import deque
 
 #Direccion IP
 HOST = "0.0.0.0"
@@ -34,11 +31,8 @@ def prosesar_dato(linea):
     if not linea:
         return None
     line = linea.strip()
-    if not (line.startswith('<') and line.endswith('>')):
-        return None
-    jsonstr = line[1:-1]
     try:
-        datos = json.loads(jsonstr)
+        datos = json.loads(line)
     except Exception:
         return None
     
@@ -50,14 +44,25 @@ def prosesar_dato(linea):
     crc = datos.get("crc")
     tp = datos.get("tp")
     
+    prov = ""
+    prov ={"dis":datos.get("dis"), "niv":datos.ger("niv"), "aut":datos.get("aut"), "tan":datos.get("tan"), "pas":datos.get("pas")}
+    crcp = calcular_crc32(json.dumps(prov))
+    
+    print(crc)
+    print(crcp)
+    if crc != crcp:
+        return None
+    
     if dis is None or niv is None or aut is None or tan is None or tp is None:
-        return None, None
+        return None
     
     datosret = {"dis": dis, "niv":niv, "aut": aut, "tan": tan,"pas":pas, "tp":tp}
     return datosret
 
 def guardar_linea(json):
     global columnas
+    if json is None:
+        return
     with lock:
         with open(ARCHIVO, "a", encoding="utf-8", newline="") as f:
             escritor = csv.DictWriter(f, fieldnames=columnas)
@@ -188,6 +193,7 @@ def enviar_cadena(cadena):
     cad = json.dumps(cad)
     if not isinstance(cad, str):
         cad = str(cad)
+    cad= cad + "\n"
     mensaje = cad.encode("utf-8")
     clientes_desconectados = []
 
